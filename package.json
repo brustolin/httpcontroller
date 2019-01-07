@@ -1,0 +1,33 @@
+{
+  "name": "httpcontroller",
+  "version": "0.1.7",
+  "description": "A http server based on the Asp.net MVC",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test" : "node test/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brustolin/httpcontroller.git"
+  },
+  "keywords": [
+    "http",
+    "server",
+    "mvc",
+    "controller"
+  ],
+  "author": "Dhiogo Ramos Brustolin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brustolin/httpcontroller/issues"
+  },
+  "homepage": "https://github.com/brustolin/httpcontroller#readme",
+  "devDependencies": {
+    "@types/node": "^10.12.12",
+    "typescript": "^3.1.6"
+  },
+  "dependencies": {
+    "busboy": "^0.2.14"
+  }
+}

@@ -1,0 +1,17 @@
+{
+    "include": [
+        "ts/*.ts"
+    ],
+    "exclude": [
+      "site/*"  
+    ],
+    "compilerOptions": {
+        "target": "es2017",
+        "module": "commonjs",
+        "moduleResolution": "Node",
+        "lib": ["es2017"],
+        "sourceMap": true,
+        "declaration": true,
+        "outDir": "lib/"
+    }
+}
