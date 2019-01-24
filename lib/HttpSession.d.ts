@@ -1,12 +1,13 @@
-declare class SessionManager {
+export declare class SessionManager {
     Sessions: {
         [key: string]: HttpSession;
     };
-    constructor();
+    private options;
+    constructor(options?: any);
+    private cleanSessions;
     newSession(): HttpSession;
     session(token: string): HttpSession;
 }
-export declare const Sessions: SessionManager;
 export declare class HttpSession {
     SessionStart: Date;
     LastRequest: Date;
@@ -16,4 +17,3 @@ export declare class HttpSession {
     };
     constructor();
 }
-export {};

@@ -1,6 +1,7 @@
 {
     "HttpServer" : {
-        "port" : 1337
+        "port" : 1337,
+        "verbose": true
     },
     "StaticHandlerConfig" : {
         "StaticRoot": "test/site",

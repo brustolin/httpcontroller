@@ -1,20 +1,18 @@
 /// <reference types="node" />
 import * as http from "http";
 import * as https from "https";
-import { HttpHandler } from "./HttpHandler";
 /**
 * Http server
 */
 export declare class HttpServer {
+    private Sessions;
     server: http.Server | https.Server;
     routes: {
-        [key: string]: typeof HttpHandler;
+        [key: string]: any;
     };
     options: any;
-    defaultHandler?: typeof HttpHandler;
-    constructor(RouteMap?: {
-        [key: string]: typeof HttpHandler | any;
-    }, options?: any);
+    defaultHandler?: any;
+    constructor(RouteMap?: any, options?: any);
     start(): void;
     private generalHandler;
 }

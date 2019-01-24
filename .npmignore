@@ -3,3 +3,4 @@ tsconfig.json
 site/
 .vscode/
 test/
+webconfig.json

@@ -3,20 +3,23 @@ import * as https from "https";
 import * as url from "url";
 import * as fs from "fs";
 import { HttpHandler } from "./HttpHandler";
+import { SessionManager } from "./HttpSession";
+import * as Cookies from "cookies"
 
 /**
 * Http server
 */
 export class HttpServer {
 
+    private Sessions = new SessionManager();
     server: http.Server | https.Server;
-    routes: { [key: string]: typeof HttpHandler };
+    routes: { [key: string]: any };
     options: any;
 
-    defaultHandler?: typeof HttpHandler;
+    defaultHandler?: any;
 
-    constructor(RouteMap?: { [key: string]: typeof HttpHandler | any }, options?) {
-        if (typeof(RouteMap) === "string") {
+    constructor(RouteMap?: any, options?) {
+        if (typeof(RouteMap) === "string" || RouteMap.prototype instanceof HttpHandler) {
             this.defaultHandler = RouteMap;
         } else {
             this.routes = RouteMap as { [key: string]: typeof HttpHandler };
@@ -24,6 +27,8 @@ export class HttpServer {
         }
 
         this.options = options || {};
+        if (!this.options.sessionCookie) this.options.sessionCookie = "HCST";
+        
         if (this.options.isSSL) {
             let httpsOptions = {
                 key: fs.readFileSync(this.options.key),
@@ -40,7 +45,8 @@ export class HttpServer {
     }
 
     private generalHandler(req: http.IncomingMessage, res: http.ServerResponse) {
-        console.log(`${req.method} ${req.url}`);
+        if (this.options && this.options.verbose === true)
+            console.log(`${req.method} ${req.url}`);
 
         const parsedUrl = url.parse(req.url);
         const requestPath = parsedUrl.pathname.split('/');
@@ -53,7 +59,11 @@ export class HttpServer {
         
         if (route) {
             if (route.prototype instanceof HttpHandler) {
-                new route().handle(req,res);
+                let routeObject = new route();
+                var cookies = new Cookies(req, res);
+                routeObject.session = this.Sessions.session(cookies.get(this.options.sessionCookie));
+                cookies.set(this.options.sessionCookie, routeObject.session.Token);
+                routeObject.handle(req,res);
                 return;
             } else if(typeof(route) === "function") {
                 route = route();

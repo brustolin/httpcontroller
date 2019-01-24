@@ -1,26 +1,39 @@
 import { GenerateToken } from "./Tools";
 
-class SessionManager {
+export class SessionManager {
     Sessions : { [key:string] : HttpSession }
-    constructor() {
+    private options : any;
+
+
+    constructor(options?) {
         this.Sessions = {};
+        this.options = options || {} ;
+        if (!this.options.cookieDuration || typeof(this.options.cookieDuration) !== "number") this.options.cookieDuration = 1200000;
+        setInterval(() => this.cleanSessions(), 60000);
+    }
+
+    private cleanSessions() {
+        let now = new Date();
+        for (let a in this.Sessions) {
+            if (Number(now) - Number(this.Sessions[a].LastRequest) > this.options.cookieDuration) {
+                delete(this.Sessions[a]);
+            }
+        }
     }
 
     newSession() : HttpSession {
         let res = new HttpSession();
         res.Token = GenerateToken(32);
-        Sessions[res.Token] = res;
+        this.Sessions[res.Token] = res;
         return res;
     }
 
     session(token: string) : HttpSession {
-        let res = Sessions[token] || this.newSession();
+        let res = this.Sessions[token] || this.newSession();
         res.LastRequest = new Date();
         return res;
     }
 }
-
-export const Sessions = new SessionManager();
 
 export class HttpSession {
     SessionStart : Date;

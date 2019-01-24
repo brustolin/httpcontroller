@@ -1,11 +1,11 @@
 {
   "name": "httpcontroller",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "description": "A http server based on the Asp.net MVC",
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "test" : "node test/index.js"
+    "test": "node test/index.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "typescript": "^3.1.6"
   },
   "dependencies": {
-    "busboy": "^0.2.14"
+    "busboy": "^0.2.14",
+    "cookies": "^0.7.3"
   }
 }

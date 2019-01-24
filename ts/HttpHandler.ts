@@ -10,8 +10,7 @@ export class HttpHandler   {
     context : { request: http.IncomingMessage, response : http.ServerResponse };
     session : HttpSession;
     get isAuthenticated() : Boolean {
-        if (this.session) return this.session.Itens["isauthenticated"] == true;
-        return false;
+        return this.session && this.session.Itens["isAuthenticated"] === true;
     }
 
     handle(req: http.IncomingMessage, res: http.ServerResponse) {
