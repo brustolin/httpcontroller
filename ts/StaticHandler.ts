@@ -40,10 +40,18 @@ export class StaticHandler extends HttpHandler {
     }
 
     handle(req: http.IncomingMessage, res: http.ServerResponse) {
+        this.context = { request: req, response :res };
+        
         const parsedUrl = url.parse(req.url);
-        let pathname = `${this.args.StaticRoot}${parsedUrl.pathname}`;
+        let pathname = path.normalize(`${this.args.StaticRoot}${parsedUrl.pathname}`);
         let ext = path.parse(pathname).ext;
         let _this = this;
+        let relative = path.relative(this.args.StaticRoot, pathname);
+        if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
+            this.NotFoundResponse();
+            return;
+        }
+
         fs.exists(pathname, function (exist) {
             if (!exist) {
                 res.statusCode = 404;
