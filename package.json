@@ -1,7 +1,7 @@
 {
   "name": "httpcontroller",
-  "version": "0.2.0",
-  "description": "A http server based on the Asp.net MVC",
+  "version": "0.2.1",
+  "description": "An http server based on view/controllers",
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",

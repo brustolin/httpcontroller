@@ -1,5 +1,5 @@
 # Http Controller
-A Node.js module to run http server based on the ASP.NET MVC.
+A Node.js module to run http server based on view/controllers.
 ## Installation 
 ```sh
 npm install httpcontroller --save
@@ -12,6 +12,18 @@ const server = new httpcontroller.HttpServer("<html><body><h1>Hello World!</h1><
 server.start();
 ```
 ```sh
+To test this code open the browser at http://localhost/
+```
+
+## Static Site
+```javascript
+const httpcontroller = require('httpcontroller');
+
+const server = new httpcontroller.HttpServer(httpcontroller.StaticHandler);
+server.start();
+```
+```sh
+Put your site content in a sub-directory called "site". Eg.: "site/index.html" (by default index.html can be accessed without declaring the file in the url).
 To test this code open the browser at http://localhost/
 ```
 

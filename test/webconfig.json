@@ -4,7 +4,7 @@
         "verbose": true
     },
     "StaticHandlerConfig" : {
-        "StaticRoot": "test/site",
+        "StaticRoot": "site",
         "TypeMap": {
             ".ico": "image/x-icon",
             ".html": "text/html",

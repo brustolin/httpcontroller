@@ -7,7 +7,7 @@ import { HttpSession } from "./HttpSession";
 
 export class HttpHandler   {
     
-    context : { request: http.IncomingMessage, response : http.ServerResponse };
+    context : { request: http.IncomingMessage, response : http.ServerResponse, action?: string, controller?: string };
     session : HttpSession;
     get isAuthenticated() : Boolean {
         return this.session && this.session.Itens["isAuthenticated"] === true;
@@ -23,7 +23,10 @@ export class HttpHandler   {
         if (requestPath.length >= 3) {
             method = requestPath[2];
         }
-        
+
+        this.context.action = method;
+        this.context.controller = this.constructor.name;
+
         method += req.method;
 
         if (this[method] == null || typeof(this[method]) !== 'function') {
@@ -70,15 +73,18 @@ export class HttpHandler   {
 
             fs.readFile(file, function (err, data) {
                 if (err) {
-                    _this.context.response.statusCode = 500;
-                    _this.context.response.end(`Error getting the file: ${err}.`);
+                    _this.ErrorResponse();
                 } else {
                     if (contentType)
-                        this.context.response.setHeader('Content-type', contentType);
+                        _this.context.response.setHeader('Content-type', contentType);
                     _this.context.response.end(data);
                 }
             });
         });
+    }
+
+    ViewResponse() {
+        this.FileResponse(`views/${this.context.controller}/${this.context.action}.html`,"text/html; charset=UTF-8");
     }
 
     protected parseMultFormAsync(req) : Promise<Array<any>> {

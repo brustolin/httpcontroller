@@ -17,6 +17,7 @@
             "preLaunchTask": "CompileTypeScript",
             "name": "Launch Server",
             "program": "${workspaceFolder}/test/index.js",
+            "cwd": "${workspaceFolder}/test/"
         }
     ],
     "compounds": [
