@@ -47,7 +47,7 @@ export class StaticHandler extends HttpHandler {
         let ext = path.parse(pathname).ext;
         let _this = this;
         let relative = path.relative(this.args.StaticRoot, pathname);
-        if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
+        if (relative == null || relative.startsWith('..') || path.isAbsolute(relative)) {
             this.NotFoundResponse();
             return;
         }
