@@ -20,7 +20,7 @@ To test this code open the browser at http://localhost/
 const httpcontroller = require('httpcontroller');
 
 const server = new httpcontroller.HttpServer(httpcontroller.StaticHandler); 
-//or const server = new httpcontroller.HttpServer( { "default":httpcontroller.StaticHandler }); //the default controller to use for all requests no handled by other controllers
+//or const server = new httpcontroller.HttpServer( { "default":httpcontroller.StaticHandler }); //the default controller to use for all requests not handled by other controllers
 server.start();
 ```
 ```sh

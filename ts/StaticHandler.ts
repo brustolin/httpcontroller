@@ -7,6 +7,7 @@ import { AppSettings } from "./AppSettings";
 
 export class StaticHandlerParameters {
     StaticRoot: string;
+    ImplicitHtml: Boolean;
     TypeMap: { [key: string]: string };
 }
 
@@ -22,6 +23,7 @@ export class StaticHandler extends HttpHandler {
     protected DefaultArgs(): StaticHandlerParameters {
         return {
             StaticRoot: "site",
+            ImplicitHtml: false,
             TypeMap: {
                 '.ico': 'image/x-icon',
                 '.html': 'text/html',
@@ -40,8 +42,8 @@ export class StaticHandler extends HttpHandler {
     }
 
     handle(req: http.IncomingMessage, res: http.ServerResponse) {
-        this.context = { request: req, response :res };
-        
+        this.context = { request: req, response: res };
+
         const parsedUrl = url.parse(req.url);
         let pathname = path.normalize(`${this.args.StaticRoot}${parsedUrl.pathname}`);
         let ext = path.parse(pathname).ext;
@@ -52,34 +54,42 @@ export class StaticHandler extends HttpHandler {
             return;
         }
 
-        fs.exists(pathname, function (exist) {
-            if (!exist) {
-                res.statusCode = 404;
-                res.end(`Page not found!`);
-                return;
-            }
-
-            // if is a directory search for index file matching the extention
-            if (fs.statSync(pathname).isDirectory()) {
-                pathname += '/index.html';
-                ext = ".html";
+        if (!fs.existsSync(pathname)) {
+            if (this.args.ImplicitHtml && ext === "") {
+                pathname += ".html";
                 if (!fs.existsSync(pathname)) {
                     res.statusCode = 404;
                     res.end(`Page not found!`);
                     return;
                 }
+                ext = ".html";
+            } else {
+                res.statusCode = 404;
+                res.end(`Page not found!`);
+                return;
             }
+        }
 
-            // read file from file system
-            fs.readFile(pathname, function (err, data) {
-                if (err) {
-                    res.statusCode = 500;
-                    res.end(`Error getting the file: ${err}.`);
-                } else {
-                    res.setHeader('Content-type', _this.args.TypeMap[ext] || 'text/plain');
-                    res.end(data);
-                }
-            });
+        // if is a directory search for index file matching the extention
+        if (fs.statSync(pathname).isDirectory()) {
+            pathname += '/index.html';
+            ext = ".html";
+            if (!fs.existsSync(pathname)) {
+                res.statusCode = 404;
+                res.end(`Page not found!`);
+                return;
+            }
+        }
+
+        // read file from file system
+        fs.readFile(pathname, function (err, data) {
+            if (err) {
+                res.statusCode = 500;
+                res.end(`Error getting the file: ${err}.`);
+            } else {
+                res.setHeader('Content-type', _this.args.TypeMap[ext] || 'text/plain');
+                res.end(data);
+            }
         });
     }
 }

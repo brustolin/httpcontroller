@@ -3,6 +3,7 @@ import { HttpHandler } from "./HttpHandler";
 import * as http from "http";
 export declare class StaticHandlerParameters {
     StaticRoot: string;
+    ImplicitHtml: Boolean;
     TypeMap: {
         [key: string]: string;
     };
