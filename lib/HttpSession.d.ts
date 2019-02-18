@@ -5,6 +5,7 @@ export declare class SessionManager {
     private options;
     constructor(options?: any);
     private cleanSessions;
+    process(context: any): void;
     newSession(): HttpSession;
     session(token: string): HttpSession;
 }

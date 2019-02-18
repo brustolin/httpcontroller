@@ -4,14 +4,17 @@ import * as url from "url";
 import * as fs from "fs";
 import { HttpHandler } from "./HttpHandler";
 import { SessionManager } from "./HttpSession";
-import * as Cookies from "cookies"
+import { HttpServerMiddleware, HttpServerMiddlewareFunction } from "./HttpMiddleware"
+import { HttpContext } from "./HttpContext";
+import * as Cookies from "cookies";
 
 /**
 * Http server
 */
 export class HttpServer {
 
-    private Sessions = new SessionManager();
+    private Sessions : SessionManager;
+    private middlewares = new Array();
     server: http.Server | https.Server;
     routes: { [key: string]: any };
     options: any;
@@ -27,7 +30,8 @@ export class HttpServer {
         }
 
         this.options = options || {};
-        if (!this.options.sessionCookie) this.options.sessionCookie = "HCST";
+        this.Sessions = new SessionManager(this.options.Sessions);
+        if (this.options.useSession !== false) this.addMiddleware(this.Sessions);
         
         if (this.options.isSSL) {
             let httpsOptions = {
@@ -40,6 +44,21 @@ export class HttpServer {
         }
     }
 
+    addMiddleware(middleware : HttpServerMiddlewareFunction | HttpServerMiddleware ) {
+        this.middlewares.push(middleware);
+    }
+
+    removeMiddleware(middleware) {
+        let index = this.middlewares.indexOf(middleware);
+        if (index>= 0) {
+            this.middlewares.splice(index,1);
+        }
+    }
+
+    allMiddlewares() {
+        return this.middlewares.map(p=>p);
+    }
+
     start() {
         this.server.listen(this.options.port || 80, function () { });
     }
@@ -47,6 +66,17 @@ export class HttpServer {
     private generalHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         if (this.options && this.options.verbose === true)
             console.log(`${req.method} ${req.url}`);
+
+        let context = new HttpContext();
+        context.request = req;
+        context.response = res;
+        context.cookies = new Cookies(req, res);
+
+        for (let mw of this.middlewares) {
+            if (typeof(mw) === "function") mw(context);
+            else if (mw && mw.process) mw.process(context);
+            if (res.finished) return;
+        }
 
         const parsedUrl = url.parse(req.url);
         const requestPath = parsedUrl.pathname.split('/');
@@ -60,10 +90,7 @@ export class HttpServer {
         if (route) {
             if (route.prototype instanceof HttpHandler) {
                 let routeObject = new route();
-                var cookies = new Cookies(req, res);
-                routeObject.session = this.Sessions.session(cookies.get(this.options.sessionCookie));
-                cookies.set(this.options.sessionCookie, routeObject.session.Token);
-                routeObject.handle(req,res);
+                routeObject.handle(context);
                 return;
             } else if(typeof(route) === "function") {
                 route = route();

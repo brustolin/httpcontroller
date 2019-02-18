@@ -1,16 +1,11 @@
 /// <reference types="node" />
-import * as http from "http";
 import { HttpSession } from "./HttpSession";
+import { HttpContext } from "./HttpContext";
 export declare class HttpHandler {
-    context: {
-        request: http.IncomingMessage;
-        response: http.ServerResponse;
-        action?: string;
-        controller?: string;
-    };
-    session: HttpSession;
+    context: HttpContext;
+    readonly session: HttpSession;
     readonly isAuthenticated: Boolean;
-    handle(req: http.IncomingMessage, res: http.ServerResponse): void;
+    handle(context: HttpContext): void;
     JsonResponse(data: any): void;
     ContentResponse(content: string | Buffer, contentType?: string): void;
     NotFoundResponse(): void;

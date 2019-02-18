@@ -4,11 +4,12 @@ export class SessionManager {
     Sessions : { [key:string] : HttpSession }
     private options : any;
 
-
     constructor(options?) {
         this.Sessions = {};
         this.options = options || {} ;
-        if (!this.options.cookieDuration || typeof(this.options.cookieDuration) !== "number") this.options.cookieDuration = 1200000;
+        if (!this.options.sessionDuration || typeof(this.options.sessionDuration) !== "number") this.options.sessionDuration = 1200000;
+        if (!this.options.sessionCookie) this.options.sessionCookie = "__HCST";
+
         setInterval(() => this.cleanSessions(), 60000);
     }
 
@@ -21,9 +22,16 @@ export class SessionManager {
         }
     }
 
+    process(context) {
+        context.session = this.session(context.cookies.get(this.options.sessionCookie));
+        context.cookies.set(this.options.sessionCookie, context.session.Token);
+    }
+
     newSession() : HttpSession {
         let res = new HttpSession();
-        res.Token = GenerateToken(32);
+        do {
+            res.Token = GenerateToken(32);
+        } while(this.Sessions[res.Token] != null);
         this.Sessions[res.Token] = res;
         return res;
     }

@@ -4,19 +4,24 @@ import * as path from 'path';
 import * as url from "url";
 import * as Busboy from 'busboy'
 import { HttpSession } from "./HttpSession";
+import { HttpContext } from "./HttpContext";
 
 export class HttpHandler   {
     
-    context : { request: http.IncomingMessage, response : http.ServerResponse, action?: string, controller?: string };
-    session : HttpSession;
+    context : HttpContext;
+  
+    get session() : HttpSession {
+        return this.context.session;
+    }
+
     get isAuthenticated() : Boolean {
         return this.session && this.session.Itens["isAuthenticated"] === true;
     }
 
-    handle(req: http.IncomingMessage, res: http.ServerResponse) {
-        this.context = { request: req, response :res };
-
-        const parsedUrl = url.parse(req.url);
+    handle(context: HttpContext) {
+        this.context = context;
+        
+        const parsedUrl = url.parse(this.context.request.url);
         const requestPath = parsedUrl.pathname.split('/');
         let method = "index";
 
@@ -27,7 +32,7 @@ export class HttpHandler   {
         this.context.action = method;
         this.context.controller = this.constructor.name;
 
-        method += req.method;
+        method += this.context.request.method;
 
         if (this[method] == null || typeof(this[method]) !== 'function') {
             this.NotFoundResponse();

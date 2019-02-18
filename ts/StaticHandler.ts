@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as url from "url";
 import { AppSettings } from "./AppSettings";
+import { HttpContext } from "./HttpContext";
 
 export class StaticHandlerParameters {
     StaticRoot: string;
@@ -41,10 +42,10 @@ export class StaticHandler extends HttpHandler {
         };
     }
 
-    handle(req: http.IncomingMessage, res: http.ServerResponse) {
-        this.context = { request: req, response: res };
+    handle(context: HttpContext) {
+        this.context = context;
 
-        const parsedUrl = url.parse(req.url);
+        const parsedUrl = url.parse(this.context.request.url);
         let pathname = path.normalize(`${this.args.StaticRoot}${parsedUrl.pathname}`);
         let ext = path.parse(pathname).ext;
         let _this = this;
@@ -58,14 +59,14 @@ export class StaticHandler extends HttpHandler {
             if (this.args.ImplicitHtml && ext === "") {
                 pathname += ".html";
                 if (!fs.existsSync(pathname)) {
-                    res.statusCode = 404;
-                    res.end(`Page not found!`);
+                    this.context.response.statusCode = 404;
+                    this.context.response.end(`Page not found!`);
                     return;
                 }
                 ext = ".html";
             } else {
-                res.statusCode = 404;
-                res.end(`Page not found!`);
+                this.context.response.statusCode = 404;
+                this.context.response.end(`Page not found!`);
                 return;
             }
         }
@@ -75,8 +76,8 @@ export class StaticHandler extends HttpHandler {
             pathname += '/index.html';
             ext = ".html";
             if (!fs.existsSync(pathname)) {
-                res.statusCode = 404;
-                res.end(`Page not found!`);
+                this.context.response.statusCode = 404;
+                this.context.response.end(`Page not found!`);
                 return;
             }
         }
@@ -84,11 +85,11 @@ export class StaticHandler extends HttpHandler {
         // read file from file system
         fs.readFile(pathname, function (err, data) {
             if (err) {
-                res.statusCode = 500;
-                res.end(`Error getting the file: ${err}.`);
+                this.context.response.statusCode = 500;
+                this.context.response.end(`Error getting the file: ${err}.`);
             } else {
-                res.setHeader('Content-type', _this.args.TypeMap[ext] || 'text/plain');
-                res.end(data);
+                this.context.response.setHeader('Content-type', _this.args.TypeMap[ext] || 'text/plain');
+                this.context.response.end(data);
             }
         });
     }
