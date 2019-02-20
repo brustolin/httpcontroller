@@ -1,10 +1,12 @@
 import { GenerateToken } from "./Tools";
+import { HttpHandler } from "./HttpHandler";
 
-export class SessionManager {
+export class SessionManager extends HttpHandler {
     Sessions : { [key:string] : HttpSession }
     private options : any;
 
     constructor(options?) {
+        super()
         this.Sessions = {};
         this.options = options || {} ;
         if (!this.options.sessionDuration || typeof(this.options.sessionDuration) !== "number") this.options.sessionDuration = 1200000;
@@ -22,9 +24,9 @@ export class SessionManager {
         }
     }
 
-    process(context) {
-        context.session = this.session(context.cookies.get(this.options.sessionCookie));
-        context.cookies.set(this.options.sessionCookie, context.session.Token);
+    handle() {
+        this.context.session = this.session(this.context.cookies.get(this.options.sessionCookie));
+        this.context.cookies.set(this.options.sessionCookie, this.context.session.Token);
     }
 
     newSession() : HttpSession {

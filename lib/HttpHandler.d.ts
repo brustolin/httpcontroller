@@ -1,18 +1,16 @@
 /// <reference types="node" />
-import { HttpSession } from "./HttpSession";
 import { HttpContext } from "./HttpContext";
-export declare class HttpHandler {
+export declare abstract class HttpHandler {
     context: HttpContext;
-    readonly session: HttpSession;
-    readonly isAuthenticated: Boolean;
-    handle(context: HttpContext): void;
+    preHandlers: Array<HttpHandler>;
+    process(context: HttpContext): void;
+    protected abstract handle(): any;
     JsonResponse(data: any): void;
     ContentResponse(content: string | Buffer, contentType?: string): void;
     NotFoundResponse(): void;
     RedirectResponse(location: any): void;
     ErrorResponse(): void;
     FileResponse(file: string, contentType?: string): void;
-    ViewResponse(): void;
     protected parseMultFormAsync(req: any): Promise<Array<any>>;
     protected parseMultForm(req: any, completed: any, errorhandler?: any): void;
 }

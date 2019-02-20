@@ -1,7 +1,7 @@
 const httpcontroller = require('../lib/index');
 const { Api } = require("./api");
 
-class Home extends httpcontroller.HttpHandler {
+class Home extends httpcontroller.Controller {
     async indexGET() {
         this.ViewResponse();
     }

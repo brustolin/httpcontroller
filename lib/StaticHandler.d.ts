@@ -1,5 +1,4 @@
 import { HttpHandler } from "./HttpHandler";
-import { HttpContext } from "./HttpContext";
 export declare class StaticHandlerParameters {
     StaticRoot: string;
     ImplicitHtml: Boolean;
@@ -11,5 +10,5 @@ export declare class StaticHandler extends HttpHandler {
     args: StaticHandlerParameters;
     constructor(args?: StaticHandlerParameters);
     protected DefaultArgs(): StaticHandlerParameters;
-    handle(context: HttpContext): void;
+    handle(): void;
 }

@@ -32,7 +32,7 @@ To test this code open the browser at http://localhost/
 ```javascript
 const httpcontroller = require('httpcontroller');
 
-class Api extends httpcontroller.HttpHandler {
+class Api extends httpcontroller.Controller {
     /* http://localhost/Api/SomeData  */
     SomeDataGET() { 
         this.JsonResponse({ data: "some data"});

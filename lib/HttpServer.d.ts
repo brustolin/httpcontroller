@@ -1,7 +1,9 @@
 /// <reference types="node" />
 import * as http from "http";
 import * as https from "https";
-import { HttpServerMiddleware, HttpServerMiddlewareFunction } from "./HttpMiddleware";
+import { HttpHandler } from "./HttpHandler";
+import { HttpContext } from "./HttpContext";
+export declare type HttpServerMiddlewareFunction = (context: HttpContext) => void;
 /**
 * Http server
 */
@@ -15,7 +17,7 @@ export declare class HttpServer {
     options: any;
     defaultHandler?: any;
     constructor(RouteMap?: any, options?: any);
-    addMiddleware(middleware: HttpServerMiddlewareFunction | HttpServerMiddleware): void;
+    addMiddleware(middleware: HttpServerMiddlewareFunction | HttpHandler): void;
     removeMiddleware(middleware: any): void;
     allMiddlewares(): any[];
     start(): void;

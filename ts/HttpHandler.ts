@@ -1,46 +1,25 @@
-import * as http from "http";
 import * as fs from 'fs';
 import * as path from 'path';
-import * as url from "url";
 import * as Busboy from 'busboy'
-import { HttpSession } from "./HttpSession";
 import { HttpContext } from "./HttpContext";
 
-export class HttpHandler   {
-    
+export abstract class HttpHandler   {
     context : HttpContext;
   
-    get session() : HttpSession {
-        return this.context.session;
-    }
+    preHandlers : Array<HttpHandler>
 
-    get isAuthenticated() : Boolean {
-        return this.session && this.session.Itens["isAuthenticated"] === true;
-    }
-
-    handle(context: HttpContext) {
+    process(context: HttpContext) {
         this.context = context;
-        
-        const parsedUrl = url.parse(this.context.request.url);
-        const requestPath = parsedUrl.pathname.split('/');
-        let method = "index";
-
-        if (requestPath.length >= 3) {
-            method = requestPath[2];
+        if (this.preHandlers != null) {
+            for (let pre of this.preHandlers) {
+                pre.process(context)
+                if (context.response.finished) return;
+            }
         }
-
-        this.context.action = method;
-        this.context.controller = this.constructor.name;
-
-        method += this.context.request.method;
-
-        if (this[method] == null || typeof(this[method]) !== 'function') {
-            this.NotFoundResponse();
-            return;
-        }
-
-        this[method]();
+        this.handle();
     }
+
+    protected abstract handle();
 
     JsonResponse(data : any) {
         this.ContentResponse(JSON.stringify(data), "application/json; charset=UTF-8")
@@ -86,10 +65,6 @@ export class HttpHandler   {
                 }
             });
         });
-    }
-
-    ViewResponse() {
-        this.FileResponse(`views/${this.context.controller}/${this.context.action}.html`,"text/html; charset=UTF-8");
     }
 
     protected parseMultFormAsync(req) : Promise<Array<any>> {

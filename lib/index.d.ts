@@ -4,4 +4,4 @@ export { HttpSession } from "./HttpSession";
 export { StaticHandler } from "./StaticHandler";
 export { AppSettings } from "./AppSettings";
 export { HttpContext } from "./HttpContext";
-export { HttpServerMiddlewareFunction, HttpServerMiddleware } from "./HttpMiddleware";
+export { Controller } from "./Controller";

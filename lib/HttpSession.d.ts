@@ -1,11 +1,12 @@
-export declare class SessionManager {
+import { HttpHandler } from "./HttpHandler";
+export declare class SessionManager extends HttpHandler {
     Sessions: {
         [key: string]: HttpSession;
     };
     private options;
     constructor(options?: any);
     private cleanSessions;
-    process(context: any): void;
+    handle(): void;
     newSession(): HttpSession;
     session(token: string): HttpSession;
 }

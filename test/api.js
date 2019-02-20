@@ -1,8 +1,8 @@
 "use strict";
 
-const { HttpHandler } = require("../lib/index");
+const { Controller } = require("../lib/index");
 
-class Api extends HttpHandler {
+class Api extends Controller {
     async ApiMessageGET() {
         this.JsonResponse({ message: "Hello from api in HTTP Controller!" });
     }

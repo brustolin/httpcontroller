@@ -1,10 +1,8 @@
 import { HttpHandler } from "./HttpHandler";
-import * as http from "http";
 import * as fs from 'fs';
 import * as path from 'path';
 import * as url from "url";
 import { AppSettings } from "./AppSettings";
-import { HttpContext } from "./HttpContext";
 
 export class StaticHandlerParameters {
     StaticRoot: string;
@@ -17,7 +15,7 @@ export class StaticHandler extends HttpHandler {
     args: StaticHandlerParameters;
 
     constructor(args?: StaticHandlerParameters) {
-        super()
+        super();
         this.args = AppSettings.StaticHandlerConfig || this.DefaultArgs();
     }
 
@@ -42,9 +40,7 @@ export class StaticHandler extends HttpHandler {
         };
     }
 
-    handle(context: HttpContext) {
-        this.context = context;
-
+    handle() {
         const parsedUrl = url.parse(this.context.request.url);
         let pathname = path.normalize(`${this.args.StaticRoot}${parsedUrl.pathname}`);
         let ext = path.parse(pathname).ext;
@@ -85,11 +81,11 @@ export class StaticHandler extends HttpHandler {
         // read file from file system
         fs.readFile(pathname, function (err, data) {
             if (err) {
-                this.context.response.statusCode = 500;
-                this.context.response.end(`Error getting the file: ${err}.`);
+                _this.context.response.statusCode = 500;
+                _this.context.response.end(`Error getting the file: ${err}.`);
             } else {
-                this.context.response.setHeader('Content-type', _this.args.TypeMap[ext] || 'text/plain');
-                this.context.response.end(data);
+                _this.context.response.setHeader('Content-type', _this.args.TypeMap[ext] || 'text/plain');
+                _this.context.response.end(data);
             }
         });
     }

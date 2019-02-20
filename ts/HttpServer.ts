@@ -4,9 +4,11 @@ import * as url from "url";
 import * as fs from "fs";
 import { HttpHandler } from "./HttpHandler";
 import { SessionManager } from "./HttpSession";
-import { HttpServerMiddleware, HttpServerMiddlewareFunction } from "./HttpMiddleware"
 import { HttpContext } from "./HttpContext";
 import * as Cookies from "cookies";
+
+
+export type HttpServerMiddlewareFunction = (context: HttpContext) => void;
 
 /**
 * Http server
@@ -44,7 +46,7 @@ export class HttpServer {
         }
     }
 
-    addMiddleware(middleware : HttpServerMiddlewareFunction | HttpServerMiddleware ) {
+    addMiddleware(middleware : HttpServerMiddlewareFunction | HttpHandler ) {
         this.middlewares.push(middleware);
     }
 
@@ -90,7 +92,7 @@ export class HttpServer {
         if (route) {
             if (route.prototype instanceof HttpHandler) {
                 let routeObject = new route();
-                routeObject.handle(context);
+                routeObject.process(context);
                 return;
             } else if(typeof(route) === "function") {
                 route = route();
