@@ -1,9 +1,12 @@
 /// <reference types="node" />
 import { HttpContext } from "./HttpContext";
-export declare abstract class HttpHandler {
+export interface IHttpHandler {
+    process(context: HttpContext): any;
+}
+export declare abstract class HttpHandler implements IHttpHandler {
     context: HttpContext;
-    preHandlers: Array<HttpHandler>;
-    process(context: HttpContext): void;
+    preHandlers: Array<IHttpHandler>;
+    process(context: HttpContext): Promise<void>;
     protected abstract handle(): any;
     JsonResponse(data: any): void;
     ContentResponse(content: string | Buffer, contentType?: string): void;
@@ -12,5 +15,4 @@ export declare abstract class HttpHandler {
     ErrorResponse(): void;
     FileResponse(file: string, contentType?: string): void;
     protected parseMultFormAsync(req: any): Promise<Array<any>>;
-    protected parseMultForm(req: any, completed: any, errorhandler?: any): void;
 }

@@ -2,9 +2,7 @@ import * as url from "url";
 import { HttpSession } from "./HttpSession";
 import { HttpHandler } from "./HttpHandler";
 
-
 export class Controller extends HttpHandler {
-   
     get session() : HttpSession {
         return this.context.session;
     }
@@ -13,26 +11,26 @@ export class Controller extends HttpHandler {
         return this.session && this.session.Itens["isAuthenticated"] === true;
     }
 
-    handle() {
+    async handle() {
         const parsedUrl = url.parse(this.context.request.url);
         const requestPath = parsedUrl.pathname.split('/');
-        let method = "index";
+        let action = "index";
 
         if (requestPath.length >= 3) {
-            method = requestPath[2];
+            action = requestPath[2];
         }
 
-        this.context.action = method;
+        this.context.action = action;
         this.context.controller = this.constructor.name;
 
-        method += this.context.request.method;
+        action += this.context.request.method;
 
-        if (this[method] == null || typeof(this[method]) !== 'function') {
+        if (this[action] == null || typeof(this[action]) !== 'function') {
             this.NotFoundResponse();
             return;
         }
 
-        this[method]();
+        await this[action]();
     }
 
     ViewResponse() {

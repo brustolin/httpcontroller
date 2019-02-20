@@ -15,7 +15,7 @@ export type HttpServerMiddlewareFunction = (context: HttpContext) => void;
 */
 export class HttpServer {
 
-    private Sessions : SessionManager;
+    private Sessions: SessionManager;
     private middlewares = new Array();
     server: http.Server | https.Server;
     routes: { [key: string]: any };
@@ -24,7 +24,7 @@ export class HttpServer {
     defaultHandler?: any;
 
     constructor(RouteMap?: any, options?) {
-        if (typeof(RouteMap) === "string" || RouteMap.prototype instanceof HttpHandler) {
+        if (typeof (RouteMap) === "string" || RouteMap.prototype instanceof HttpHandler) {
             this.defaultHandler = RouteMap;
         } else {
             this.routes = RouteMap as { [key: string]: typeof HttpHandler };
@@ -34,38 +34,38 @@ export class HttpServer {
         this.options = options || {};
         this.Sessions = new SessionManager(this.options.Sessions);
         if (this.options.useSession !== false) this.addMiddleware(this.Sessions);
-        
+
         if (this.options.isSSL) {
             let httpsOptions = {
                 key: fs.readFileSync(this.options.key),
                 cert: fs.readFileSync(this.options.cert)
             };
-            this.server = https.createServer(httpsOptions,(req,res) => this.generalHandler(req, res));
+            this.server = https.createServer(httpsOptions, (req, res) => this.generalHandler(req, res));
         } else {
-            this.server = http.createServer((req,res) => this.generalHandler(req,res));
+            this.server = http.createServer((req, res) => this.generalHandler(req, res));
         }
     }
 
-    addMiddleware(middleware : HttpServerMiddlewareFunction | HttpHandler ) {
+    addMiddleware(middleware: HttpServerMiddlewareFunction | HttpHandler) {
         this.middlewares.push(middleware);
     }
 
     removeMiddleware(middleware) {
         let index = this.middlewares.indexOf(middleware);
-        if (index>= 0) {
-            this.middlewares.splice(index,1);
+        if (index >= 0) {
+            this.middlewares.splice(index, 1);
         }
     }
 
     allMiddlewares() {
-        return this.middlewares.map(p=>p);
+        return this.middlewares.map(p => p);
     }
 
     start() {
         this.server.listen(this.options.port || 80, function () { });
     }
 
-    private generalHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    private async generalHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         if (this.options && this.options.verbose === true)
             console.log(`${req.method} ${req.url}`);
 
@@ -75,8 +75,10 @@ export class HttpServer {
         context.cookies = new Cookies(req, res);
 
         for (let mw of this.middlewares) {
-            if (typeof(mw) === "function") mw(context);
-            else if (mw && mw.process) mw.process(context);
+            if (typeof (mw) === "function")
+                await mw(context);
+            else if (mw && mw.process && typeof(mw.process) === "function")
+                await mw.process(context);
             if (res.finished) return;
         }
 
@@ -88,16 +90,17 @@ export class HttpServer {
         } else {
             route = this.defaultHandler;
         }
-        
+
         if (route) {
             if (route.prototype instanceof HttpHandler) {
                 let routeObject = new route();
-                routeObject.process(context);
+                await routeObject.process(context);
+                if (!res.finished) res.end();
                 return;
-            } else if(typeof(route) === "function") {
+            } else if (typeof (route) === "function") {
                 route = route();
             }
-            
+
             if (typeof route === "string" || route instanceof Buffer) {
                 res.end(route);
             } else {
