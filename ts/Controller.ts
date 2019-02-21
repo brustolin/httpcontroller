@@ -3,6 +3,9 @@ import { HttpSession } from "./HttpSession";
 import { HttpHandler } from "./HttpHandler";
 
 export class Controller extends HttpHandler {
+
+    name:string;
+
     get session() : HttpSession {
         return this.context.session;
     }
@@ -21,6 +24,7 @@ export class Controller extends HttpHandler {
         }
 
         this.context.action = action;
+        if (this.name)  this.context.controller = this.name;
         
         action += this.context.request.method;
 

@@ -2,6 +2,11 @@ const httpcontroller = require('../lib/index');
 const { Api } = require("./api");
 
 class Home extends httpcontroller.Controller {
+    constructor(){
+        super();
+        this.name = "Home";
+    }
+    
     async indexGET() {
         this.ViewResponse();
     }

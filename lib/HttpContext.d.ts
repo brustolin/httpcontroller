@@ -9,4 +9,5 @@ export declare class HttpContext {
     action?: String;
     controller?: string;
     session?: HttpSession;
+    data?: any;
 }

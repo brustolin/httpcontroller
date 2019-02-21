@@ -14,5 +14,8 @@ export declare abstract class HttpHandler implements IHttpHandler {
     RedirectResponse(location: any): void;
     ErrorResponse(): void;
     FileResponse(file: string, contentType?: string): void;
-    protected parseMultFormAsync(req: any): Promise<Array<any>>;
+    private requestBody;
+    private parseRequestBody;
+    protected parseMultFormAsync(req: any): Promise<any>;
+    private addValueToObject;
 }
