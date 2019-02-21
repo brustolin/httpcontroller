@@ -78,15 +78,6 @@ export class StaticHandler extends HttpHandler {
             }
         }
 
-        // read file from file system
-        fs.readFile(pathname, function (err, data) {
-            if (err) {
-                _this.context.response.statusCode = 500;
-                _this.context.response.end(`Error getting the file: ${err}.`);
-            } else {
-                _this.context.response.setHeader('Content-type', _this.args.TypeMap[ext] || 'text/plain');
-                _this.context.response.end(data);
-            }
-        });
+        this.FileResponse(pathname, _this.args.TypeMap[ext] || 'text/plain');
     }
 }

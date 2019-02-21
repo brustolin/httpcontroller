@@ -86,8 +86,10 @@ export class HttpServer {
         const requestPath = parsedUrl.pathname.split('/');
         let route;
         if (requestPath.length > 1 && this.routes) {
+            context.controller = requestPath[1];
             route = this.routes[requestPath[1]] || this.defaultHandler;
         } else {
+            context.controller = "default";
             route = this.defaultHandler;
         }
 

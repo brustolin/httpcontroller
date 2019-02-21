@@ -16,13 +16,12 @@ export class Controller extends HttpHandler {
         const requestPath = parsedUrl.pathname.split('/');
         let action = "index";
 
-        if (requestPath.length >= 3) {
+        if (requestPath.length >= 3 && requestPath[2].length > 0) {
             action = requestPath[2];
         }
 
         this.context.action = action;
-        this.context.controller = this.constructor.name;
-
+        
         action += this.context.request.method;
 
         if (this[action] == null || typeof(this[action]) !== 'function') {
