@@ -1,6 +1,6 @@
 {
   "name": "httpcontroller",
-  "version": "0.4.5",
+  "version": "0.4.7",
   "description": "An http server based on view/controllers",
   "main": "lib/index.js",
   "scripts": {

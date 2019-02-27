@@ -22,7 +22,8 @@ export abstract class HttpHandler implements IHttpHandler {
                     if (context.response.finished) return;
                 }
             }
-            if (this.context.request.method === "POST" && this.context.data == null) {
+            if (this.context.request.method === "POST" && this.context.request["postDataRead"] != true) {
+                this.context.request["postDataRead"] = true;
                 this.context.data = await this.parseRequestBody();
             }
             await this.handle();
@@ -90,10 +91,8 @@ export abstract class HttpHandler implements IHttpHandler {
 
     private parseRequestBody(): Promise<any> {
         return new Promise(async (resolve, reject) => {
-            let tp = this.context.request.headers["content-type"].toLowerCase();
             try {
-                if (tp.startsWith("multipart/form-data")) tp = "multipart/form-data";
-
+                let tp = (this.context.request.headers["content-type"] || "").split(";")[0];
                 switch (tp) {
                     case "application/json":
                         let j = await this.requestBody();
